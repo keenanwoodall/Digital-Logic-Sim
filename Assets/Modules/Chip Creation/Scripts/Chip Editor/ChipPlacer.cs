@@ -138,8 +138,6 @@ namespace DLS.ChipCreation
 
 		void HandleBusPlacementInput()
 		{
-
-
 			BusDisplay[] busChips = activeChips.Select(c => c as BusDisplay).ToArray();
 			BusDisplay.PlacementState placementState = busChips[0].CurrentPlacementState;
 			bool shiftKeyDown = Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed;
@@ -249,7 +247,7 @@ namespace DLS.ChipCreation
 			}
 		}
 
-		void FinishPlacingActiveChips()
+		public void FinishPlacingActiveChips()
 		{
 			if (IsPlacingChip)
 			{

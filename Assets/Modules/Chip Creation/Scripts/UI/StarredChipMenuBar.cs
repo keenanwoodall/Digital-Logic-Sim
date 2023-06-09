@@ -47,6 +47,8 @@ namespace DLS.ChipCreation.UI
 
 				CustomButton button = CreateButton(chipName);
 				button.ButtonClicked += () => OnButtonPressed(chipDescription);
+				button.ButtonBeganDrag += () => OnButtonPressed(chipDescription);
+				button.ButtonReleased += () => chipCreationManager.ActiveEditChipEditor.ChipPlacer.FinishPlacingActiveChips();
 
 				allButtons.Add(button);
 				chipDescriptions.Add(chipDescription);

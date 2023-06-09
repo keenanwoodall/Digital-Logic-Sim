@@ -6,8 +6,10 @@ using UnityEngine.EventSystems;
 
 namespace DLS.ChipCreation
 {
-	public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, ISelectHandler
+	public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISelectHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 	{
+		public event System.Action ButtonBeganDrag;
+		public event System.Action ButtonReleased;
 		public event System.Action ButtonClicked;
 		public event System.Action ButtonRightClicked;
 		public event System.Action ButtonPressedDown;
@@ -145,6 +147,24 @@ namespace DLS.ChipCreation
 					textDisplay.text = text;
 				}
 			}
+		}
+
+		public void OnBeginDrag(PointerEventData eventData)
+		{
+			ButtonBeganDrag?.Invoke();
+		}
+
+		public void OnPointerUp(PointerEventData eventData)
+		{
+			ButtonReleased?.Invoke();
+		}
+
+		public void OnDrag(PointerEventData eventData)
+		{
+		}
+
+		public void OnEndDrag(PointerEventData eventData)
+		{
 		}
 	}
 }
