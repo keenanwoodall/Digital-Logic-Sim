@@ -21,6 +21,8 @@ namespace DLS.MainMenu
 
 		void Start()
 		{
+			Application.targetFrameRate = 60;
+			
 			// Register button listeners
 			quitButton?.onClick.AddListener(Quit);
 			for (int i = 0; i < menus.Length; i++)
