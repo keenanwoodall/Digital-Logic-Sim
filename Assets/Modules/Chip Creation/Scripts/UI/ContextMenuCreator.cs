@@ -35,7 +35,7 @@ namespace DLS.ChipCreation.UI
 				// Context menu for mouse over chip
 				if (activeEditor.ChipUnderMouse != null)
 				{
-					CreateChipContextMenu(activeEditor.ChipUnderMouse);
+					CreateChipContextMenu(activeEditor.ChipSelector.SelectedChips);
 
 				}
 				else if (activeEditor.PinUnderMouse != null && activeEditor.CanEdit)
@@ -52,16 +52,27 @@ namespace DLS.ChipCreation.UI
 			}
 		}
 
-		void CreateChipContextMenu(ChipBase chip)
+		void CreateChipContextMenu(IReadOnlyList<ChipBase> chips)
 		{
+			var listCopy = new List<ChipBase>();
+			listCopy.AddRange(chips);
 			activeContextMenu = CreateContextMenu();
 
-			activeContextMenu.SetTitle(chip.Name);
-			activeContextMenu.AddButton("View", () => ViewChip(chip));
+			if (listCopy.Count == 1)
+			{
+				activeContextMenu.SetTitle(listCopy[0].Name);
+				activeContextMenu.AddButton("View", () => ViewChip(chips[0]));
+			}
 
 			if (controller.ActiveViewChipEditor.CanEdit)
 			{
-				activeContextMenu.AddButton("Delete", () => DeleteChip(chip));
+				activeContextMenu.AddButton("Delete", () =>
+				{
+					foreach (var chip in listCopy)
+					{
+						DeleteChip(chip);	
+					}
+				});
 			}
 		}
 

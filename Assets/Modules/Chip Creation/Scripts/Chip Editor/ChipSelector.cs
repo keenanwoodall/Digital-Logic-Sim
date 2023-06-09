@@ -191,7 +191,7 @@ namespace DLS.ChipCreation
 		// If chip pressed with right mouse, select only that chip
 		void OnChipPressedRightMouse(ChipBase chip)
 		{
-			DeselectAll();
+			//DeselectAll();
 			AddToSelection(chip);
 			chipSelectedThisFrame = true;
 		}
