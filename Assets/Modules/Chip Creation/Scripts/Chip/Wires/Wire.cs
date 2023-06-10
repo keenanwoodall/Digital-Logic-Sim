@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections.ObjectModel;
+using System.Linq;
 using SebInput;
 
 namespace DLS.ChipCreation
@@ -24,6 +25,7 @@ namespace DLS.ChipCreation
 		[SerializeField] float wireCurveAmount;
 		[SerializeField] int wireCurveResolution;
 		[SerializeField] MeshRenderer busConnectionDot;
+		[SerializeField] WireControlPoint controlPointSeed;
 
 		List<Vector2> anchorPoints;
 		Vector3[] drawPoints;
@@ -54,6 +56,7 @@ namespace DLS.ChipCreation
 			if (SourcePin != pinA)
 			{
 				anchorPoints.Reverse();
+				RegenerateControlPoints();
 			}
 
 			// Delete wire if either pin is deleted
@@ -82,6 +85,8 @@ namespace DLS.ChipCreation
 				busConnectionDot.transform.position = busConnectionPoint.WithZ(RenderOrder.busConnectionDot);
 				busConnectionDot.transform.localScale = Vector3.one * DisplaySettings.PinSize * 0.6f;
 			}
+			
+			RegenerateControlPoints();
 		}
 
 		public void DeleteWire()
@@ -133,6 +138,8 @@ namespace DLS.ChipCreation
 		public void SetAnchorPoints(IList<Vector2> points, bool updateGraphics)
 		{
 			anchorPoints = new List<Vector2>(points);
+			RegenerateControlPoints();
+
 			if (updateGraphics)
 			{
 				UpdateLineRenderer();
@@ -140,18 +147,42 @@ namespace DLS.ChipCreation
 		}
 
 
+		private List<WireControlPoint> controlPoints = new();
 		public void AddAnchorPoint(Vector2 point)
 		{
 			// Don't add point if too close to previous anchor point
 			if (anchorPoints.Count == 0 || (anchorPoints[^1] - point).sqrMagnitude > 0.01f)
 			{
 				anchorPoints.Add(point);
+				RegenerateControlPoints();
 			}
+		}
+
+		private void RegenerateControlPoints()
+		{
+			foreach (var controlPoint in controlPoints)
+				Destroy(controlPoint.gameObject);
+			controlPoints.Clear();
+			for (var i = 0; i < anchorPoints.Count; i++)
+			{
+				var anchorPoint = anchorPoints[i];
+				AddControlPoint(anchorPoint, i > 0 && (i < anchorPoints.Count - 1 || !IsConnected));
+			}
+		}
+		
+		private void AddControlPoint(Vector2 point, bool visible)
+		{
+			var newControlPoint = Instantiate(controlPointSeed);
+			newControlPoint.gameObject.SetActive(visible);
+			newControlPoint.Initialize(this, controlPoints.Count);
+			newControlPoint.SetPosition(point);
+			controlPoints.Add(newControlPoint);
 		}
 
 		public void UpdateAnchorPoint(int i, Vector2 point)
 		{
 			anchorPoints[i] = point;
+			controlPoints[i].SetPosition(point);
 			UpdateLineRenderer();
 		}
 
@@ -160,6 +191,7 @@ namespace DLS.ChipCreation
 			if (anchorPoints.Count > 1)
 			{
 				anchorPoints.RemoveAt(anchorPoints.Count - 1);
+				RegenerateControlPoints();
 			}
 		}
 
@@ -251,6 +283,14 @@ namespace DLS.ChipCreation
 				SourcePin.PinMoved -= OnPinMove;
 				TargetPin.PinMoved -= OnPinMove;
 			}
+
+			foreach (var controlPoint in controlPoints)
+			{
+				if (controlPoint && controlPoint.gameObject)
+					Destroy(controlPoint.gameObject);
+			}
+
+			controlPoints.Clear();
 		}
 	}
 }
