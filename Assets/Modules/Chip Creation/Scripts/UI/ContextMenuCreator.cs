@@ -61,7 +61,7 @@ namespace DLS.ChipCreation.UI
 			if (listCopy.Count == 1)
 			{
 				activeContextMenu.SetTitle(listCopy[0].Name);
-				activeContextMenu.AddButton("View", () => ViewChip(chips[0]));
+				activeContextMenu.AddButton("View", () => ViewChip(listCopy[0]));
 			}
 
 			if (controller.ActiveViewChipEditor.CanEdit)
